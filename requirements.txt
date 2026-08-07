@@ -1,0 +1,13 @@
+pandas
+numpy
+pymupdf
+pdfplumber
+spacy
+sentence-transformers
+hdbscan
+umap-learn
+bertopic
+scikit-learn
+matplotlib
+tqdm
+requests
