@@ -9,3 +9,4 @@ Problems:
 Next step: hopefully if this system works expanding the inputs through automated or manual means is another task entirely 
 
 AI use: Claude structured what a build for this pipeline may look like i have discussed and traded ideas onto what are reasonable goals for today before it helps me with the coding process.
+Concluding update: SETUP complete config setup corpus still needs building .
