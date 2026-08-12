@@ -25,3 +25,11 @@ validation of cross checking the actual pdfs against a zoetero record to encure 
 Problems: some text names were not consistent across actual pdf and zotero metadata. plus some pdf were missing its metadata that had to be handled mannually (short unwanted fix).
 table data is flattend in order yes but falttened. will have to fix later stages of pipeline
 Ai use: intructional guidance on how to code in desgin and discussion on the overall design of teh system including the way forward in building each section.
+11/8/26
+Built s2_filter.py — coarse document-level filter tagging each doc is_relevant + domain_term_hits, reading corpus.csv, writing corpus_filtered.csv. Tags, doesn't delete (full corpus retained; dropped papers recoverable).
+Method: case-insensitive count of distinct DOMAIN_TERMS (27 terms, tiered by identity/property/structure/application) against RELEVANCE_THRESHOLD, both in config.py.
+Threshold set empirically to 8, not pre-chosen — the hit-count distribution was clearly bimodal (domain papers mostly 10–25, ML/method papers 0–5), and 8 sits in the gap between the two populations. Rejected 5 (let method-adjacent papers leak in) and 10 (dropped genuine papers without solving the real issue).
+Validated against known corpus: cleanly separates ~14 steel-domain papers from ML/NLP method papers (Blei, BERTopic, Sentence-BERT, Weston, etc. all correctly dropped).
+Known limitation (logged honestly): frequency-counting measures vocabulary-density, not topical focus — so vocabulary-dense market/demand papers (Bauer 21, Lucchini 19) pass despite being market-side not materials-side. No threshold cleanly removes them; decision is to separate them at the clustering stage rather than distort the filter.
+De Almeida (8, borderline transformer-regulation paper) — [note whichever you decided: kept as application-context / flagged borderline].
+Rejected alternative: embedding-similarity filtering — deferred to Pass 2 as more robust but less transparent.
