@@ -1,0 +1,32 @@
+JIS family (pattern: digits-A-digits):
+35A210
+35A300
+50A470
+50A700
+50A1000
+50A1300
+
+EN family (pattern: M-digits-dash-digits-A, optional trailing digit):
+M300-35A
+M300-35A5
+
+Nippon-H family (pattern: digits-H-optional letters-digits-optional letter):
+35H250
+50H270
+50H310
+50H600
+15HTH1000
+20HTH1200
+20HTH1500
+20HTH1800
+15HST780Y
+20HST570Y
+20HST780Y
+35HXT680T
+
+JFE code (pattern: digits-JNE-digits):
+50JNE300
+
+Cogent/Tata (pattern: NO-digits, optional dash-digits):
+NO20
+NO30-1600
