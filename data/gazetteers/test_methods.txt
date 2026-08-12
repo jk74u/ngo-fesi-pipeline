@@ -1,0 +1,17 @@
+Epstein frame
+Epstein square
+Epstein test
+25 cm Epstein frame
+single sheet tester
+single sheet test
+SST
+ring specimen
+ring sample
+toroidal sample
+rotating iron loss simulator
+rotational loss measurement
+vibrating sample magnetometer
+XRD
+X-ray diffraction
+EBSD
+VSM

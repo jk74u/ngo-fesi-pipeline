@@ -24,4 +24,16 @@ BUCKET_YEARS = 5
 #MODEL NAMES
 SPACY_MODEL = "en_core_web_sm"
 EMBED_MODEL = "all-MiniLM-L6-v2"
-GAZETTEER_PATH = DATA_RAW / "gazetteer.txt" 
+#NER gazeteer
+GAZETTEER_DIR = DATA_RAW / "gazetteers"
+# file name matching to the entity type in NER model 
+GAZETTEER_FILES = {
+    "applications.txt":        "APPLICATION",
+    "competing_materials.txt": "COMPETING_MATERIAL",
+    "producers.txt":           "PRODUCER",
+    "processing_terms.txt":    "PROCESSING",
+    "brand_grades.txt":        "GRADE_BRAND",
+    "standards.txt":           "STANDARD",
+    "test_methods.txt":        "TEST_METHOD",
+    "out_of_scope_grades.txt": "OOS_GRADE",
+}

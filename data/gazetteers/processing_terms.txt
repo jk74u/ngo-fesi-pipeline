@@ -1,0 +1,57 @@
+continuous casting
+thin slab casting
+twin-roll casting
+strip casting
+hot rolling
+hot band annealing
+cold rolling
+skin pass
+temper rolling
+decarburisation
+decarburization
+final annealing
+continuous annealing
+stress relief annealing
+stress-relief annealing
+domain refinement
+CVD siliconizing
+chemical vapour deposition
+punching
+stamping
+blanking
+laser cutting
+wire-cut EDM
+electrical discharge machining
+waterjet cutting
+deburring
+backlack bonding
+self-bonding
+interlocking
+welding
+shrink fitting
+insulation coating
+insulating coating
+additive manufacturing
+3D printing
+selective laser melting
+punchability
+stampability
+weldability
+texture
+anisotropy
+Goss texture
+cube texture
+rotated cube
+gamma-fibre
+gamma fibre
+γ-fibre
+alpha-fibre
+α-fibre
+eta-fibre
+η-fibre
+{100} texture
+<001> texture
+texture evolution
+recrystallisation
+recrystallization
+grain growth

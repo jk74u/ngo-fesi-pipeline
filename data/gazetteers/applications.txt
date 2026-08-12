@@ -1,0 +1,112 @@
+traction motor
+EV traction motor
+HEV traction motor
+electric traction motor
+drive motor
+EPS motor
+electric power steering
+electric power steering motor
+brush DC motor
+brushed DC motor
+electric brake system
+brake actuator
+turbocharger motor
+electric turbocharger
+reactor
+high-frequency reactor
+high frequency reactor
+boost converter
+compressor motor
+air conditioner motor
+air-conditioner motor
+high-speed motor
+high speed motor
+generator
+medium generator
+wind turbine generator
+wind generator
+alternator
+integrated starter alternator
+starter generator
+large rotating machine
+rotating machine
+medium AC motor
+AC motor
+small motor
+kitchen appliance motor
+appliance motor
+household appliance
+pump motor
+fan motor
+lamp ballast
+ballast
+welding transformer
+audio transformer
+small power transformer
+distribution transformer
+power transformer
+industry transformer
+industrial transformer
+dry-type transformer
+oil-immersed transformer
+DER transformer
+IPMSM
+IPM
+IPM machine
+interior permanent magnet synchronous motor
+interior permanent magnet machine
+interior permanent-magnet synchronous motor
+PMSM
+permanent magnet synchronous machine
+permanent magnet synchronous motor
+permanent magnet motor
+SPM
+surface permanent magnet machine
+SRM
+switched reluctance machine
+switched reluctance motor
+synchronous reluctance machine
+SynRM
+induction motor
+induction machine
+squirrel cage induction motor
+asynchronous machine
+axial flux machine
+radial flux machine
+stator core
+rotor core
+stator
+rotor
+sheet stack
+lamination stack
+core stack
+laminated core
+stator yoke
+rotor yoke
+stator teeth
+stator tooth
+stator tooth tip
+tooth tip
+back iron
+bridge
+rotor bridge
+rib
+rotor rib
+flux barrier
+segment core
+segmented stator
+stator slot
+slot
+air gap
+BEV
+battery electric vehicle
+EV
+electric vehicle
+HEV
+hybrid electric vehicle
+PHEV
+plug-in hybrid electric vehicle
+plugin hybrid electric vehicle
+xEV
+electric powertrain
+electric drivetrain
