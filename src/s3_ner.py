@@ -1,6 +1,6 @@
 import spacy
 import pandas as pd
-from src.config import DATA_PROCESSED, SPACY_MODEL
+from src.config import DATA_PROCESSED, SPACY_MODEL, GAZETTEER_DIR, GAZETTEER_FILES
 
 GRADE_PATTERNS = [
     #JIS family (single token)
@@ -114,9 +114,38 @@ def run_piece_2():
     ruler = nlp.add_pipe("entity_ruler", before="ner")
     ruler.add_patterns(GRADE_PATTERNS)
     ruler.add_patterns(MEASUREMENT_PATTERNS)
-    print("Added custom grade patterns to the NER model.")
+    #adding regex patterns
+    ruler.add_patterns(load_gazetteer_patterns())
+    print("Added custom grade ,measurements and gazetteer patterns to the NER model.")
     # Preview entities in the first few documents
     preview_entities(relevant_df, nlp, num_docs=2)
+
+def load_gazetteer_patterns():
+    all_patterns= []
+    print("Loading gazetteer patterns from files...")
+    for filename, label in GAZETTEER_FILES.items():
+        filepath = GAZETTEER_DIR / filename
+        #Faliure to find file warning
+        if not filepath.exists():
+            print(f"Warning: Gazeteer file missing - {filepath}")
+            continue
+
+        term_count = 0
+#Encoding critical to maintain special symbol terms
+        with open(filepath, 'r', encoding='utf-8') as f:
+            for line in f:
+                term = line.strip()
+                if term:
+                    #skips blank lines
+                    all_patterns.append({"label": label, "pattern": term})
+                    term_count += 1
+        print(f"{label: <20}: {term_count: >3} terms loaded from {filename}")
+    print(f"total gazetteer patterns loaded: {len(all_patterns)}")
+    print("------------------------------------------------\n")
+
+    return all_patterns
+
+
 
 if __name__ == "__main__":
     run_piece_2()

@@ -25,7 +25,7 @@ BUCKET_YEARS = 5
 SPACY_MODEL = "en_core_web_sm"
 EMBED_MODEL = "all-MiniLM-L6-v2"
 #NER gazeteer
-GAZETTEER_DIR = DATA_RAW / "gazetteers"
+GAZETTEER_DIR = ROOT / "data" / "gazetteers"
 # file name matching to the entity type in NER model 
 GAZETTEER_FILES = {
     "applications.txt":        "APPLICATION",
