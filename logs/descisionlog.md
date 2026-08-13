@@ -33,3 +33,5 @@ Validated against known corpus: cleanly separates ~14 steel-domain papers from M
 Known limitation (logged honestly): frequency-counting measures vocabulary-density, not topical focus — so vocabulary-dense market/demand papers (Bauer 21, Lucchini 19) pass despite being market-side not materials-side. No threshold cleanly removes them; decision is to separate them at the clustering stage rather than distort the filter.
 De Almeida (8, borderline transformer-regulation paper) — [note whichever you decided: kept as application-context / flagged borderline].
 Rejected alternative: embedding-similarity filtering — deferred to Pass 2 as more robust but less transparent.
+12/8/26: 
+spaCy pipeline established; pretrained NER (Tier 3) confirmed working on filtered corpus — catches producers (ORG) and geography (GPE); heavy noise on units/table-numbers/citations observed, confirming the need for Tier-1 regex and Tier-2 gazetteers to handle domain entities the general model mishandles.
