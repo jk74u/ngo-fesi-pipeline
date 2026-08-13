@@ -1,5 +1,6 @@
 import spacy
 import pandas as pd
+import re
 from src.config import DATA_PROCESSED, SPACY_MODEL, GAZETTEER_DIR, GAZETTEER_FILES
 
 GRADE_PATTERNS = [
@@ -55,9 +56,19 @@ MEASUREMENT_PATTERNS = [
 ]},
 ]
 
+#Context scoping ensuring terms belong to Ngo or GO
+NGO_TRIGGERS = [
+    r"\bnon-oriented\b",
+    r"\bnon-grain-oriented\b",
+    r"\bngo\b"
+]
 
+COMPETITOR_LABELS= {"COMPETING_MATERIAL", "OOS_GRADE"}
 
-
+TARGET_LABELS = {
+        "GRADE", "CORE_LOSS", "SI_CONTENT",
+        "MPA_VALUE", "FLUX_DENSITY"
+    }
 
 def load_relevant_corpus():
     
@@ -144,8 +155,67 @@ def load_gazetteer_patterns():
     print("------------------------------------------------\n")
 
     return all_patterns
+#SCOPE TAG evaluates whther a sentence around an entity has values which categorise it as NGO or another
+def scope_tag(ent, doc):
+#Sentence grabbing
+    sent = ent.sent
+    sent_text_lower = sent.text.lower()
 
+    #Checking sentence for NGo values
+    has_ngo = any(re.search(pattern, sent_text_lower) for pattern in NGO_TRIGGERS)
+    #status for any competitor or OOS/GO steel
+    has_competitor = False
 
+    for other_ent in doc.ents:
+        #checks if entities are withina sentence length first
+        if other_ent.start_char >= sent.start_char and other_ent.end_char <= sent.end_char:
+            #check if it has competitor or GO/OOs word in "sentence"
+            if other_ent.label_ in COMPETITOR_LABELS:
+                #Ensure not matching the entity agaisnt itself
+                if other_ent != ent:
+                    has_competitor = True
+                    break # if it does stop the program
+
+# Assigning context label
+#runs through scenarios and results( reminds me of a joke in undergrad just if statement allscenarios and its AI bro)
+    if has_competitor and not has_ngo:
+        return "COMPETITOR"
+    elif has_ngo and not has_competitor:
+        return "NGO"
+    elif has_ngo and has_competitor:
+        return "AMBIGUOUS"
+    else: 
+        return "UNSPECIFIED"
+
+def extract_scoped_entities(df, nlp):
+    #Applying the context scoping onto the tier1 entities MEAsurements and grades.
+    records = []
+    # only applying these to priority info  for instance the tier 1 mentioned
+   
+
+    for _, row in df.iterrows():
+        text = row['text']
+        doc_id = row.get('doc_id','Unknown')
+
+        if not isinstance(text, str):
+            continue
+        doc = nlp(text)
+
+        for ent in doc.ents:
+            if ent.label_ in TARGET_LABELS:
+                #actual scope taggin logiv
+                scope = scope_tag(ent,doc)
+                context_sentence = ent.sent.text.strip()
+
+                #Bundled into combined record
+                records.append({
+                    "doc_id": doc_id,
+                    "text": ent.text,
+                    "label": ent.label_,
+                    "scope_tag": scope,
+                    "context": context_sentence
+                })
+    return records
 
 if __name__ == "__main__":
     run_piece_2()

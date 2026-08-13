@@ -15,6 +15,7 @@ high permeability grain-oriented
 amorphous alloy
 amorphous ribbon
 amorphous metal
+amorphous metals
 amorphous steel
 Fe-based amorphous alloy
 Fe-based amorphous
