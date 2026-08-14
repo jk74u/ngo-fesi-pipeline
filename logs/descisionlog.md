@@ -35,3 +35,42 @@ De Almeida (8, borderline transformer-regulation paper) — [note whichever you 
 Rejected alternative: embedding-similarity filtering — deferred to Pass 2 as more robust but less transparent.
 12/8/26: 
 spaCy pipeline established; pretrained NER (Tier 3) confirmed working on filtered corpus — catches producers (ORG) and geography (GPE); heavy noise on units/table-numbers/citations observed, confirming the need for Tier-1 regex and Tier-2 gazetteers to handle domain entities the general model mishandles.
+13/8/26:STAGE 3 PIECES 3(MEASUREMENT REGEX) PIECE 4(LOADING GAZETTEER) PIECE 5(CONTEXT SCOPING)
+Piece 3 key decisions & problems: so this is extration for numnerics such as core loss si content flux density etc. the key issue here is the constatnly testing to see if they could be gathered in one token or more was needed. Also results of whether accidental figures that looks like flux density was gathered which we had to tighten the formula struture for but also MPa values that did not seem realistic or relevant but filtering for this seems a job for another stage like S4 normalisation.
+piece 4: its now mapping the gazeteer files to SpaCy 8 files of text terms introducing those into the current numeric applied system
+piece 5: context scoping the attempt in trying to tag the context of the numeric values of whether it is relevant for an NGo or A GO.
+*  ok now how far do we scope for context well luckily ent.sent is a SpaCy function that can do the current sentence a target entity is in
+* we have NGO tags Competitor/OOS(Go) tag AMbigouous (conflited) unspecified (no clue) tags
+We base this off being able to make sure we are transparent as much as we can in finidngs. accuracy first if context is mixed then we dont weigh how much we just tag it mixed
+* sentence is stored with each entity and is retriveable for debugging and transparency.
+RESULTS 268 UNSPECIFIED, 24 COMPETITOR, 22 NGO, 6 AMBIGOUOUS.
+now the unspecification could come down to 2 reasons but after tests came down to most numeric data living in tables and due to flattening table extraction is difficult and therefore grabbing context even more so.
+Ai use:AI note (for GAIT): Claude explained the sentence-scoping approach, the character-span/ent.sent mechanism, and reviewed/debugged the code; scoping logic and design decisions implemented and reasoned by me.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

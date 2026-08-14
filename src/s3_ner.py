@@ -216,6 +216,96 @@ def extract_scoped_entities(df, nlp):
                     "context": context_sentence
                 })
     return records
+#combines all the process results the entities the tagged entities the doc id it comes from together
+def build_entity_table(df, nlp):
+    records = []
+    
+    print("\n---Final NER Table---")
 
+    for _, row in df.iterrows():
+        doc_id = row.get('doc_id', 'Unknown')
+        text = row['text']
+
+        #if text is not a string
+        if not isinstance(text, str):
+            continue
+
+        doc = nlp(text)
+
+        # looping through every entity in a document.
+        for ent in doc.ents:
+            # only assign scope tage if the value has it if nto leave it blank.
+            if ent.label_ in TARGET_LABELS:
+                scope = scope_tag(ent, doc)
+            else:
+                scope = ""
+            
+            record = {
+                "doc_id": doc_id,
+                "entity_text": ent.text,
+                "label": ent.label_,
+                "scope_tag": scope,
+                "context": ent.sent.text.strip(),
+                "start_char": ent.start_char,
+                "end_char": ent.end_char,
+            }
+
+            records.append(record)
+
+    print(f"Total of {len(records)} extracted entities across all documents")
+    return records
+
+
+#builds and prints exports the final result
+def run_stage3():
+    print("\n=== STAGE 3 ENTITY EXTRACTION ===")
+
+    # 1. Loading the relevant corpus
+    df = load_relevant_corpus()
+    total_relevant_docs = len(df)
+    print(f"loaded {total_relevant_docs} relevant documents for extraction")
+
+# deploying the stage 3 pipeline
+    print(f"Loading spaCy model '{SPACY_MODEL}' ...")
+    nlp = spacy.load(SPACY_MODEL)
+
+    ruler = nlp.add_pipe("entity_ruler", before="ner")
+    print("Loading entity patterns...")
+    # Add regex patterns and gazetteer
+    ruler.add_patterns(GRADE_PATTERNS + MEASUREMENT_PATTERNS)
+    ruler.add_patterns(load_gazetteer_patterns())
+
+    # building table
+    records = build_entity_table(df, nlp)
+
+    # Convert to DataFrame
+    entities_df = pd.DataFrame(records)
+
+    # The report
+    print("\n--- Extraction Summary ---")
+    print(f"Toatal entities extracted: {len(entities_df)}")
+
+    print("\nCount per label:")
+    print (entities_df['label'].value_counts().to_string())
+
+    print("\n Scope-tagged distribution")
+    scope_df = entities_df[entities_df['scope_tag'] != ""]
+    if not scope_df.empty:
+        print(scope_df['scope_tag'].value_counts().to_string())
+    else:
+        print("No scoped entities found")
+    # Documents with 0 entities
+    docs_with_entities = entities_df['doc_id'].nunique()
+    zero_entity_docs = total_relevant_docs - docs_with_entities
+    print(f"\nDocuments producing 0 entities: {zero_entity_docs} out of {total_relevant_docs} relevant docs")
+    if zero_entity_docs > 0:
+        print("extraction faliure cases")
+
+    # Save the final output
+    output_path = DATA_PROCESSED / "entities.csv"
+    entities_df.to_csv(output_path, index=False)
+    print(f"\nSuccessfully saved Stage 3 out put to: {output_path}")
+
+        
 if __name__ == "__main__":
-    run_piece_2()
+    run_stage3()
