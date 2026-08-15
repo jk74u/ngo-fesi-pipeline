@@ -37,3 +37,8 @@ GAZETTEER_FILES = {
     "test_methods.txt":        "TEST_METHOD",
     "out_of_scope_grades.txt": "OOS_GRADE",
 }
+#Clusteringvaraibles
+CLUSTER_UNIT = "chunk"
+CHUNK_SIZE_CHARS = 500  #FIXED CHUINK SIZE
+CHUNK_MIN_CHARS = 100   # SKIPS CHUNKS SHORTER THAN 100
+RANDOM_SEED = 42   #for reproducibility purposes
