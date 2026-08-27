@@ -55,6 +55,9 @@ Ai use:AI note (for GAIT): Claude explained the sentence-scoping approach, the c
 
 
 
+25/8/26: BigQuery automatic patent input 
+Google cloud project ID:ngo-fesi-patents
+27/8/26: canocalising entity spellings off supervisor feedback, plotted graphs off cost, thicness distribution , and results of stage 3 
 
 
 

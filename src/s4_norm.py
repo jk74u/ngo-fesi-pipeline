@@ -9,18 +9,48 @@ KEEP_LABELS = {
 }
 
 VALUE_LABELS = {"CORE_LOSS", "SI_CONTENT", "MPA_VALUE", "FLUX_DENSITY"}
-
+#fixating units for measurements
 UNIT_BY_LABEL = {
     "CORE_LOSS": "W/kg",
     "SI_CONTENT": "%",
     "MPA_VALUE": "MPa",
     "FLUX_DENSITY": "T",
 }
-
+# setting realistic mpa limits for steel related info
 PROPERTY_BOUNDS = {
     "yield_strength": (180, 900),
     "tensile_strength": (300, 950),
     "applied_stress": (0, 400),
+}
+# matches entities spelling variations into one
+COMPETITOR_ALIASES = {
+    #amorphous
+    "amorphous metal": "amorphous alloy",
+    "amorphous metals": "amorphous alloy",
+    "amorphous alloy": "amorphous alloy",
+#grain oriented names
+    "goes": "grain-oriented electric steel",
+    "go steel": "grain-oriented electric steel",
+    "grain oriented electric steel": "grain-oriented electric steel",
+    "grain-oriented electric steel": "grain-oriented electric steel",
+    "grain oriented steel": "grain-oriented electric steel",
+    "grain-oriented electrical steel": "grain-oriented electric steel",
+    "grain oriented electrical steel": "grain-oriented electric steel",
+    "high permeability grain-oriented": "grain-oriented electric steel",
+    "grain-oriented material": "grain-oriented electric steel",
+    "grain-oriented silicon steel": "grain-oriented electric steel",
+    "grain-oriented steel": "grain-oriented electric steel",
+#NdFeB names
+    "nd-fe-b": "NdFeB",
+    "ndfeb": "NdFeB",
+    "neodymium iron boron": "NdFeB",
+# Soft Magnetic Composite
+    "smc": "SMC",
+    "soft magnetic composite": "SMC",
+    "soft magnetic composites": "SMC",
+# Fe amaorphous alloy
+    "fe-based amorphous": "Fe-based amorphous",
+    "fe-based amorphous alloy": "Fe-based amorphous",
 }
 
 def load_entities():
@@ -63,6 +93,14 @@ def canonicalise(entity_text, value_numeric, unit):
         return f"{value_numeric} {unit}"
     # everything else: keep original text as-is (grades/terms canonicalised later)
     return entity_text
+def canonicalise_entity(entity_text, label):
+    #only canonicalising competitor names
+    if label != "COMPETING_MATERIAL":
+        return entity_text
+    if not isinstance(entity_text, str):
+        return entity_text
+        # checks for case insensitivites and any not mapped are not changed.
+    return COMPETITOR_ALIASES.get(entity_text.lower().strip(), entity_text)
 
 def resolve_property(context, label):
     # organising context for MPA values
@@ -129,7 +167,10 @@ def run_stage4():
         lambda row: validate(row['value_numeric'], row['resolved_property']),
         axis=1
 )
-
+    filtered['canonical_entity'] = filtered.apply(
+        lambda row: canonicalise_entity(row['entity_text'], row['label']),
+        axis=1
+)
     #Printed report
     print(f"Entities before filter: {before}")
     print(f"Entities after filter: {after}")
@@ -159,6 +200,11 @@ def run_stage4():
     print(f"\nValues flagged for review: {len(flagged)}")
     if not flagged.empty:
         print(flagged[['entity_text', 'resolved_property', 'value_numeric', 'review_flag']].to_string(index=False))
+
+# canolicalisation of competitor entities check:
+    comp = filtered[filtered['label'] == 'COMPETING_MATERIAL']
+    print("\nCompetitor canonicalisation (surface -> canonical):")
+    print(comp[['entity_text', 'canonical_entity']].drop_duplicates().to_string(index=False))
 #Saving file
     output_path = DATA_PROCESSED / "entities_normalised.csv"
     filtered.to_csv(output_path, index=False)

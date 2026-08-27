@@ -165,7 +165,7 @@ def run_stage6():
         comp = ents[ents['label'] == 'COMPETING_MATERIAL'] 
 
         if not comp.empty:
-            comp_trends = prevalance_over_time(comp, 'entity_text', count_mode = "docs")
+            comp_trends = prevalance_over_time(comp, 'canonical_entity', count_mode = "docs")
             comp_trends = comp_trends.T
 
             comp_csv_path = DATA_PROCESSED / "competitor_trends.csv"

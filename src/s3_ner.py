@@ -1,6 +1,7 @@
 import spacy
 import pandas as pd
 import re
+import matplotlib.pyplot as plt
 from src.config import DATA_PROCESSED, SPACY_MODEL, GAZETTEER_DIR, GAZETTEER_FILES
 
 GRADE_PATTERNS = [
@@ -255,6 +256,31 @@ def build_entity_table(df, nlp):
     print(f"Total of {len(records)} extracted entities across all documents")
     return records
 
+#PLOTTING
+def plot_entity_distribution(df):
+    domain_labels =["GRADE", "CORE_LOSS", "SI_CONTENT", "MPA_VALUE", "FLUX_DENSITY",
+                    "APPLICATION", "COMPETING_MATERIAL", "PRODUCER", "PROCESSING",
+                    "GRADE_BRAND", "STANDARD", "TEST_METHOD", "OOS_GRADE",]
+    counts = df[df['label'].isin(domain_labels)]['label'].value_counts() #counts total per label
+
+    #sorts the order per smallest to biggest label
+    counts = counts.sort_values()
+
+    fig, ax = plt.subplots(figsize=(9, 6))
+    counts.plot(kind='barh', ax=ax, color='steelblue')
+    for i, v in enumerate(counts):
+        ax.text(v, i, f" {v}", va='center', fontsize=8)
+        
+    ax.set_xlabel("Number of entities extracted")
+    ax.set_ylabel("Entity type")
+    ax.set_title("Domain entity extraction by type (Stage 3 NER)")
+    plt.tight_layout()
+
+    outpath = DATA_PROCESSED / "entity_distribution.png"
+    plt.savefig(outpath, dpi=120)
+    plt.close()
+    print(f"Saved entity distribution to: {outpath.name}")
+    
 
 #builds and prints exports the final result
 def run_stage3():
@@ -280,6 +306,8 @@ def run_stage3():
 
     # Convert to DataFrame
     entities_df = pd.DataFrame(records)
+    #plot
+    plot_entity_distribution(entities_df)
 
     # The report
     print("\n--- Extraction Summary ---")

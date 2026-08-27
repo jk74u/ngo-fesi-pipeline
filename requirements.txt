@@ -11,4 +11,4 @@ scikit-learn
 matplotlib
 tqdm
 requests
-
+adjustText

@@ -1,6 +1,10 @@
 import pandas as pd
 import re
 from src.config import DATA_PROCESSED
+from adjustText import adjust_text
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 def parse_thickness(grade_text):
     # inferring steel thickness from grade names etc
@@ -73,6 +77,82 @@ def build_bridge_table(df):
     final_cols = [col for col in expected_cols if col in bridge_df.columns]
 
     return bridge_df[final_cols]
+def plot_cost_curve(bridge_df):
+    # pulling the grades tha gave a thickness
+    grades = bridge_df[bridge_df['thickness_mm'].notna()]
+    x = grades['thickness_mm']
+    y = grades['relative_price_eur_kg']
+
+    fig, ax = plt.subplots(figsize=(9,6))
+
+    # equation from hemsen plotted as a smooth curve
+    d = np.linspace(x.min() * 0.9, x.max() * 1.1, 200)
+    k = 0.35 / d
+    ax.plot(d, k, color='grey', linestyle='--', label='Hemsen: k = 0.35 / d')
+
+    ax.scatter(x,y, color='tab:red', alpha=0.6, s=40, label='Extracted grades')
+    #annotating grades plotted 
+    
+    to_label = grades.sort_values('thickness_mm').drop_duplicates('thickness_mm')
+    #counts number of grades and shows one example
+    label_data = (grades.groupby('thickness_mm')
+                        .agg(n_grades=('entity_text', 'size'),
+                            example=('entity_text', 'first'),
+                            price=('relative_price_eur_kg', 'first'))
+                        .reset_index())
+    print("COLUMNS:", label_data.columns.tolist())
+    print(label_data.head())
+    texts = []
+    
+    for _, r in label_data.iterrows():
+        label = f"{r['n_grades']} grades, e.g. {r['example']}"
+        texts.append(ax.text(r['thickness_mm'], r['price'], label, fontsize=7))
+    adjust_text(texts, ax=ax, arrowprops=dict(arrowstyle='-', color='grey', lw=0.4))
+        #ax.annotate(name, (xi, yi), fontsize=6, rotation=45, ha='left', va='bottom', xytext=(2,2), textcoords='offset points')
+
+    stats_text = (
+        f"n = {len(grades)} grades\n"
+        f"Thickness: {grades['thickness_mm'].nunique()}\n"
+        f"Price range: {y.min():.2f}-{y.max():.2f} Eur/Kg\n"
+        f"Mean price: {y.mean():.2f} Eur/Kg\n"
+        f"Median: {y.median():.2f} Eur/Kg\n"
+        f"Std dev: {y.std():.2f}"
+    )
+    ax.text(0.78, 0.78, stats_text, transform=ax.transAxes,
+            fontsize=8, va='center',
+            bbox=dict(boxstyle='round', facecolor='whitesmoke', edgecolor='grey'))
+
+
+    ax.set_xlabel("Sheet thickness (mm)")
+    ax.set_ylabel("Relative price (Eur/Kg)")
+    ax.set_title("Extracted Grade thickness against Hemsens price equation(k=0.35/d)")
+    ax.legend()
+    plt.tight_layout()
+
+    outpath = DATA_PROCESSED / "cost_thickness_curve.png"
+    plt.savefig(outpath, dpi=120)
+    plt.close()
+    print(f"Saved cost curve to: {outpath.name}")
+def plot_thickness_distribution(bridge_df):
+    #pulling grades that provide a thickness
+    grades = bridge_df[bridge_df['thickness_mm'].notna()]
+    #totals grades per thickness in ascending order
+    counts = grades['thickness_mm'].value_counts().sort_index()
+
+    fig, ax = plt.subplots(figsize=(9,6))
+    ax.bar(counts.index.astype(str), counts.values, color='steelblue', width=0.6)
+    ax.set_xlabel("Sheet thickness (mm)")
+    ax.set_ylabel("Number of grades")
+    ax.set_title("Grades sheet thickness distribution")
+
+    for i, v in enumerate(counts.values):
+        ax.text(i, v, str(v), ha='center', va='bottom', fontsize=9)
+
+    plt.tight_layout()
+    outpath = DATA_PROCESSED / "thickness_distribution.png"
+    plt.savefig(outpath, dpi=120)
+    plt.close()
+    print(f"Saved thicnkess distribution to: {outpath.name}")
 
 def run_stage7():
     # calls the functions and prints the results for display
@@ -86,6 +166,9 @@ def run_stage7():
 
     #bridge construction
     bridge_df = build_bridge_table(df)
+    #plotting bridge construciton
+    plot_cost_curve(bridge_df)
+    plot_thickness_distribution(bridge_df)
 
     # THe report
     print("\n---- Cost bridge report ----")

@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 from src.config import DATA_PROCESSED, CLUSTER_UNIT, CHUNK_SIZE_CHARS, CHUNK_MIN_CHARS, EMBED_MODEL, RANDOM_SEED
 from sentence_transformers import SentenceTransformer
 from bertopic import BERTopic
@@ -83,6 +85,35 @@ def cluster_units(texts, embeddings):
     topics, probs = topic_model.fit_transform(texts, embeddings=embeddings)
 
     return topic_model, topics
+def plot_topic_sizes(topic_info):
+    # dropping the -1 topic as its not real
+    ti = topic_info[topic_info['Topic'] != -1]
+    # takes the largest topics by chunk size and put in ascending order
+    top = ti.nlargest(12, 'Count').sort_values('Count') 
+
+    fig, ax = plt.subplots(figsize=(10,6))
+    #colors relevant topics to non relevant
+    steel_topics = [0, 5, 15, 17, 38]
+    colors  = ['tab:orange' if t in steel_topics else 'steelblue' for t in top['Topic']]
+
+    ax.barh(top['Name'], top['Count'], color=colors)
+    ax.legend(handles=[
+    Patch(color='tab:orange', label='Steel-relevant topic'),
+    Patch(color='steelblue', label='Other topic')
+    ], loc='lower right', fontsize=8)
+
+    ax.set_xlabel("Number of Chunks")
+    ax.set_ylabel("Topic")
+    ax.set_title("Largest topics by chunk count")
+
+    for i, v in enumerate(top['Count']):
+        ax.text(v, i, f" {v}", va='center', fontsize=8)
+    
+    plt.tight_layout()
+    outpath = DATA_PROCESSED / "topic_sizes.png"
+    plt.savefig(outpath, dpi=120)
+    plt.close()
+    print(f"saved topic sizes to: {outpath.name}")
 
 def run_stage5():
     units = prepare_units()
@@ -104,6 +135,7 @@ def run_stage5():
     topic_info = topic_model.get_topic_info()
     topic_names = dict(zip(topic_info['Topic'], topic_info['Name']))
     units['topic_name'] = units['topic'].map(topic_names)
+    plot_topic_sizes(topic_info)
     #Saving output
     output_path = DATA_PROCESSED / "units_clustered.csv"
     units.to_csv(output_path, index=False)
