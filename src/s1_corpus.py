@@ -75,6 +75,18 @@ def assemble_canonical_row(pdf_path, year_lookup, missing_years_list, doc_id=Non
         "ingest_date": datetime.date.today().isoformat()
     }
     return row
+def report_tokens(df):
+    df['token_count'] = df['text'].apply(lambda t: len(str(t).split()))
+
+    print(f"\nTotal tokens across corpus: {df['token_count'].sum():,}")
+    print(f"\nMean tokens per document: {df['token_count'].sum():,}")
+    print(f"\nMin/Max tokens : {df['token_count'].min()} /{df['token_count'].max()} ")
+    print("\nTokens per document:")
+    print(df[['doc_id','title','token_count']].sort_values('token_count', ascending=False).to_string(index=False))
+
+    out = DATA_PROCESSED / "corpus_tokens.csv"
+    df[['doc_id','title','token_count']].to_csv(out, index=False)
+    print(f"\nSaved token counts to: {out.name}")
 
 #COPUS FINAL BOSS
 def build_corpus():
@@ -106,7 +118,7 @@ def build_corpus():
 
     total_pdfs = len(pdf_files)
     successful_extractions = total_pdfs - failed_extractions
-
+    report_tokens(df)
     print(f"\n----INGESTION SUMMARY----")
     print(f"Total PDFs processed: {total_pdfs}")
     print(f"Successful extractions: {successful_extractions}")
