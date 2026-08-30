@@ -1,20 +1,9 @@
-canonical_entity,1990-1994,2005-2009,2010-2014,2015-2019,2020-2024,2025-2029
-AlNiCo,0,0,0,0,2,0
-FINEMET,0,0,0,0,1,0
-Fe-based amorphous,0,1,0,0,0,0
-HGO,0,0,0,0,1,0
-METGLAS,0,0,0,0,1,0
-NdFeB,0,0,0,0,2,0
-Ni-Fe alloy,0,0,0,1,0,0
-RGO,0,0,0,0,0,1
-SMC,0,0,0,0,2,0
-SmCo,0,0,0,0,1,0
-amorphous alloy,1,1,0,1,1,0
-amorphous ribbon,1,0,0,0,0,0
-amorphous steel,0,0,0,1,1,0
-cobalt-iron,0,0,0,0,1,0
-dysprosium,0,0,0,0,2,0
-ferrite,0,1,1,0,4,1
-ferrite magnet,0,0,0,0,2,0
-grain-oriented electric steel,1,2,1,1,4,1
-permalloy,0,0,0,0,1,0
+canonical_entity,1990-1994,1995-1999,2000-2004,2005-2009,2010-2014,2015-2019,2020-2024,2025-2029
+FINEMET,0,0,0,0,0,0,1,0
+Hard Magnetic Material,0,0,0,0,0,0,2,0
+SMC,0,0,0,0,0,0,2,0
+amorphous,1,0,0,1,0,1,2,0
+cobalt-iron,0,0,0,0,0,0,1,0
+ferrite,0,0,0,1,1,0,4,1
+grain-oriented electric steel,1,0,0,2,1,1,4,1
+permalloy,0,0,0,0,0,1,1,0

@@ -1,6 +1,17 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
-from src.config import DATA_PROCESSED, START_YEAR, BUCKET_YEARS
+import matplotlib.patches as patches
+from src.config import DATA_PROCESSED, START_YEAR, END_YEAR ,BUCKET_YEARS
+
+def generate_period_labels():
+    labels = []
+    for y in range(START_YEAR, END_YEAR + 1, BUCKET_YEARS):
+        labels.append(f"{y}-{y + BUCKET_YEARS -1}")
+    return labels
+def is_partial_period(label):
+    end_year_of_bucket = int(label.split('-')[1])
+    return end_year_of_bucket > END_YEAR
 
 def load_year_map():
     # creates a dictionary mapping bettween doc_id and publication year
@@ -46,7 +57,47 @@ def prevalance_over_time(df, category_col, count_mode="docs"):
     
     table = grouped.unstack(fill_value=0)
 
+    labels = generate_period_labels()
+    table = table.reindex(labels, fill_value=0)
+
     return table
+
+def plot_heatmap(table, title, outpath):
+    labels = generate_period_labels()
+    plot_table = table.reindex(columns=labels, fill_value=0)
+    plot_table = plot_table.loc[plot_table.sum(axis=1).sort_values(ascending=False).index]
+
+    n_rows, n_cols = plot_table.shape
+    fig_width = 2+ (0.9 * n_cols)
+    fig_height = 1.5 + (0.5 * n_rows)
+
+    fig, ax =plt.subplots(figsize=(fig_width, fig_height))
+    cax = ax.imshow(plot_table.values, cmap='Blues', aspect='auto', vmin=0, vmax=plot_table.values.max())
+    
+    ax.set_xticks(np.arange(n_cols))
+    ax.set_yticks(np.arange(n_rows))
+    ax.set_xticklabels(plot_table.columns, rotation=45, ha='right')
+    ax.set_yticklabels(plot_table.index)
+
+    threshold = plot_table.values.max() * 0.6
+
+    for i in range(n_rows):
+        for j in range(n_cols):
+            val = plot_table.values[i, j]
+            text_color = "white" if val > threshold else "black"
+            ax.text(j, i, int(val), ha="center", va="center", color=text_color)
+    
+    cbar = fig.colorbar(cax, ax=ax, shrink=0.6)
+    cbar.set_label("Document count")
+    for j, label in enumerate(plot_table.columns):
+        if is_partial_period(label):
+            rect = patches.Rectangle((j- 0.5,-0.5), 1, n_rows, fill=False, linestyle='dashed', edgecolor='black', lw=1)
+            ax.add_patch(rect)
+            
+    plt.title(title)
+    plt.tight_layout()
+    plt.savefig(outpath, dpi=120)
+    plt.close()
 
 def plot_trends(table, title, outpath):
     #filterab le line chart 
@@ -65,7 +116,7 @@ def plot_trends(table, title, outpath):
     plt.savefig(outpath, dpi=120)
     plt.close()
 
-def plot_stacked(table, title, outpath):
+def plot_stacked(table, title, outpath, docs_per_bucket=None):
     plot_table = table.T.sort_index()
     ax = plot_table.plot(kind= 'bar', stacked=True, figsize=(10, 6))
 
@@ -82,7 +133,9 @@ def plot_stacked(table, title, outpath):
                 if pct >=1:
                     ax.text(i, cumulative + value/2, f"{pct:.0f}%", ha ='center', va='center', fontsize=7)
                 cumulative += value
-
+        if docs_per_bucket is not None and bucket in docs_per_bucket:
+            n_docs = docs_per_bucket[bucket]
+            ax.text(i, total, f"n={n_docs}", ha='center', va='bottom', fontsize=8, fontweight='bold')
 
 
     plt.title(title)
@@ -134,24 +187,24 @@ def run_stage6():
         #plotting the relevant topics
         valid_topics = [t for t in topic_trends.index if str(t) != '-1']
         top_topics = topic_trends.loc[valid_topics].sum(axis=1).nlargest(5).index
-        plot_trends(
+        plot_heatmap(
             topic_trends.loc[top_topics].rename(index=topic_name_map),
             " top 5 topics over Time (Distinct Docs)",
-            DATA_PROCESSED / "topic_trends_top5.png"
+            DATA_PROCESSED / "topic_heatmap_top5.png"
         )
-        print("saved topic trends plot to: topic_trends_top5.png")
+        print("saved topic heatmap plot to: topic_trends_top5.png")
         #plotting relevant topics
-        steel_topics = [0, 5, 15, 17, 38]
+        steel_topics = [0, 2, 5, 12, 15, 17, 38]
         #protection to make sure only indexed topics are plotted here
         active_steel_topics = [t for t in steel_topics if t in topic_trends.index]
 
         if active_steel_topics:
-            plot_trends(
+            plot_heatmap(
                 topic_trends.loc[active_steel_topics].rename(index=topic_name_map),
                 "Steel-Relevant Topics Over Time (Distic Docs)",
                 DATA_PROCESSED / "topic_trends_steel.png"
             )
-            print("E-steel relevant topics saved to : topic_trends_steel.png")
+            print("E-steel relevant topics saved to : topic_heatmap_steel.png")
     else:
         print(f"\n WARNING: {units_path.name} not found. skipping topic trends")
 
@@ -174,17 +227,18 @@ def run_stage6():
 
             plot_stacked(
                 comp_trends,
-                "Competing Material Movement Over TIme",
-                DATA_PROCESSED / "competitor_trends_stacked.png"
+                "Competing Material Over TIme",
+                DATA_PROCESSED / "competitor_trends_stacked.png",
+                docs_per_bucket=docs_per_bucket
             )
             print("SAved competitor stacked plot to: competitor_trends_stacked.png")
         else:
             print("No COMPETING_MATERIAL entities found to plot")
         
-        apps = ents[ents['label'] == 'APPLICATION'] 
+        pure_apps = ents[(ents['label'] == 'APPLICATION') & (ents['subtype'] == 'application')]
 
-        if not apps.empty:
-            app_trends = prevalance_over_time(apps, 'entity_text', count_mode = "docs")
+        if not pure_apps.empty:
+            app_trends = prevalance_over_time(pure_apps, 'canonical_entity', count_mode = "docs")
             app_trends = app_trends.T
 
             app_csv_path = DATA_PROCESSED / "application_trends.csv"
@@ -194,12 +248,34 @@ def run_stage6():
             top_apps = app_trends.sum(axis=1).nlargest(8).index
             plot_stacked(
                 app_trends.loc[top_apps],
-                "Application Movement Over TIme",
-                DATA_PROCESSED / "application_trends_stacked.png"
+                "Application Over TIme",
+                DATA_PROCESSED / "application_trends_stacked.png",
+                docs_per_bucket=docs_per_bucket
             )
             print("SAved applications stacked plot to: application_trends_stacked.png")
         else:
             print("No Application entities found to plot")
+        #component call  logic
+        components = ents[(ents['label'] == 'APPLICATION') & (ents['subtype'] == 'component')]
+        if not components.empty:
+            comp_trends_sub = prevalance_over_time(components, 'canonical_entity', count_mode = "docs")
+            comp_trends_sub = comp_trends_sub.T
+
+            comp_csv_path_sub = DATA_PROCESSED / "component_trends.csv"
+            comp_trends_sub.to_csv(comp_csv_path_sub)
+            print(f"Saved competitor trends to: {comp_csv_path_sub.name}")
+
+            top_comps = comp_trends_sub.sum(axis=1).nlargest(8).index
+            plot_stacked(
+                comp_trends_sub.loc[top_comps],
+                "Components Over TIme",
+                DATA_PROCESSED / "component_trends_stacked.png",
+                docs_per_bucket=docs_per_bucket
+            )
+            print("SAved applications stacked plot to: component_trends_stacked.png")
+        else:
+            print("No component entities found to plot")
+
     else:
             print(f"\nWARNING: {ents_path.name} not found. Skipping entity trends" )
         

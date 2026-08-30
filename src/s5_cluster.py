@@ -93,7 +93,7 @@ def plot_topic_sizes(topic_info):
 
     fig, ax = plt.subplots(figsize=(10,6))
     #colors relevant topics to non relevant
-    steel_topics = [0, 5, 15, 17, 38]
+    steel_topics = [0, 2, 5, 12, 15, 17, 38]
     colors  = ['tab:orange' if t in steel_topics else 'steelblue' for t in top['Topic']]
 
     ax.barh(top['Name'], top['Count'], color=colors)

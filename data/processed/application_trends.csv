@@ -1,47 +1,41 @@
-entity_text,1990-1994,2005-2009,2010-2014,2015-2019,2020-2024,2025-2029
-BEV,0,0,0,0,2,0
-DER transformer,0,0,0,1,0,0
-EPS motor,0,1,0,0,0,0
-EV,0,0,2,2,2,1
-EV traction motor,0,0,0,0,2,0
-HEV,0,1,2,1,2,0
-HEV traction motor,0,1,1,0,0,0
-IPM,0,1,1,1,2,0
-IPM machine,0,0,1,0,0,0
-IPMSM,0,0,1,0,0,0
-PHEV,0,0,0,0,2,0
-PMSM,0,0,0,0,3,0
-SRM,0,0,0,0,3,0
-SynRM,0,0,0,0,1,0
-battery electric vehicle,0,0,0,0,1,0
-boost converter,0,1,0,0,0,0
-bridge,0,1,1,1,2,0
-distribution transformer,1,0,0,1,1,0
-drive motor,0,0,0,0,1,0
-electric power steering,0,0,0,0,1,0
-electric traction motor,0,0,0,0,1,0
-electric vehicle,0,0,0,0,3,0
-generator,0,0,0,0,2,1
-high-speed motor,0,1,0,0,0,0
-hybrid electric vehicle,0,1,1,0,2,0
-induction motor,0,0,0,0,1,0
-integrated starter alternator,0,0,1,0,0,0
-interior permanent magnet synchronous motor,0,0,1,0,0,0
-oil-immersed transformer,0,0,0,1,0,0
-permanent magnet motor,0,0,0,0,1,0
-permanent magnet synchronous machine,0,0,0,0,3,0
-plug-in hybrid electric vehicle,0,0,0,0,1,0
-power transformer,1,0,0,0,2,0
-reactor,0,1,0,0,1,0
-rotating machine,1,1,0,0,0,0
-rotor,0,0,2,1,5,0
-rotor bridge,0,0,0,1,0,0
-rotor core,0,1,1,1,0,0
-segment core,0,0,0,1,0,0
-stator,0,0,2,1,5,0
-stator core,1,1,1,1,2,0
-switched reluctance motor,0,0,0,0,1,0
-traction motor,0,1,0,1,1,0
-wind generator,0,0,0,0,1,0
-wind turbine generator,0,0,0,0,1,0
-xEV,0,0,0,0,1,0
+canonical_entity,1990-1994,1995-1999,2000-2004,2005-2009,2010-2014,2015-2019,2020-2024,2025-2029
+BEV,0,0,0,0,0,0,2,0
+DER transformer,0,0,0,0,0,1,0,0
+EPS motor,0,0,0,1,0,0,0,0
+EV,0,0,0,0,2,2,2,1
+EV traction motor,0,0,0,0,0,0,2,0
+HEV traction motor,0,0,0,1,1,0,0,0
+IPM machine,0,0,0,0,1,0,0,0
+IPMSM,0,0,0,0,1,0,0,0
+PHEV,0,0,0,0,0,0,2,0
+PMSM,0,0,0,0,0,0,3,0
+SRM,0,0,0,0,0,0,3,0
+SynRM,0,0,0,0,0,0,1,0
+battery electric vehicle,0,0,0,0,0,0,1,0
+boost converter,0,0,0,1,0,0,0,0
+distribution transformer,1,0,0,0,0,1,1,0
+drive motor,0,0,0,0,0,0,1,0
+electric power steering,0,0,0,0,0,0,1,0
+electric traction motor,0,0,0,0,0,0,1,0
+electric vehicle,0,0,0,0,0,0,3,0
+generator,0,0,0,0,0,0,2,1
+high-speed motor,0,0,0,1,0,0,0,0
+hybrid electric vehicle,0,0,0,1,2,1,2,0
+induction motor,0,0,0,0,0,0,1,0
+integrated starter alternator,0,0,0,0,1,0,0,0
+interior permanent magnet synchronous motor,0,0,0,0,1,0,0,0
+oil-immersed transformer,0,0,0,0,0,1,0,0
+permanent magnet motor,0,0,0,0,0,0,1,0
+permanent magnet synchronous machine,0,0,0,0,0,0,3,0
+plug-in hybrid electric vehicle,0,0,0,0,0,0,1,0
+power transformer,1,0,0,0,0,0,2,0
+reactor,0,0,0,1,0,0,1,0
+rotating machine,1,0,0,1,0,0,0,0
+rotor bridge,0,0,0,0,0,1,0,0
+rotor core,0,0,0,1,1,1,0,0
+segment core,0,0,0,0,0,1,0,0
+switched reluctance motor,0,0,0,0,0,0,1,0
+traction motor,0,0,0,1,0,1,1,0
+wind generator,0,0,0,0,0,0,1,0
+wind turbine generator,0,0,0,0,0,0,1,0
+xEV,0,0,0,0,0,0,1,0

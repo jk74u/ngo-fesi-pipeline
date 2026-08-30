@@ -25,9 +25,11 @@ PROPERTY_BOUNDS = {
 # matches entities spelling variations into one
 COMPETITOR_ALIASES = {
     #amorphous
-    "amorphous metal": "amorphous alloy",
-    "amorphous metals": "amorphous alloy",
-    "amorphous alloy": "amorphous alloy",
+    "amorphous metal": "amorphous",
+    "amorphous metals": "amorphous",
+    "amorphous alloy": "amorphous",
+    "amorphous steel": "amorphous",
+    "amorphous ribbon": "amorphous",
 #grain oriented names
     "goes": "grain-oriented electric steel",
     "go steel": "grain-oriented electric steel",
@@ -40,17 +42,45 @@ COMPETITOR_ALIASES = {
     "grain-oriented material": "grain-oriented electric steel",
     "grain-oriented silicon steel": "grain-oriented electric steel",
     "grain-oriented steel": "grain-oriented electric steel",
-#NdFeB names
-    "nd-fe-b": "NdFeB",
-    "ndfeb": "NdFeB",
-    "neodymium iron boron": "NdFeB",
+    "hgo": "grain-oriented electric steel",
+    "rgo": "grain-oriented electric steel",
+
+#hard-magnetic material names
+    "nd-fe-b": "Hard Magnetic Material",
+    "ndfeb": "Hard Magnetic Material",
+    "neodymium iron boron": "Hard Magnetic Material",
+    "alnico": "Hard Magnetic Material",
+    "smco": "Hard Magnetic Material",
+    "dysprosium": "Hard Magnetic Material",
+    "ferrite magnet": "Hard Magnetic Material",
+
 # Soft Magnetic Composite
     "smc": "SMC",
     "soft magnetic composite": "SMC",
     "soft magnetic composites": "SMC",
 # Fe amaorphous alloy
-    "fe-based amorphous": "Fe-based amorphous",
-    "fe-based amorphous alloy": "Fe-based amorphous",
+    "fe-based amorphous": "amorphous",
+    "fe-based amorphous alloy": "amorphous",
+    "metglas": "amorphous",
+    #permalloy
+    "permalloy": "permalloy",
+    "ni-fe alloy": "permalloy",
+
+}
+
+APPLICATION_ALIASES = {
+    "hybrid electric vehicle": "hybrid electric vehicle",
+    "hev": "hybrid electric vehicle",
+    "stator": "stator",
+    "stator core": "stator",
+    "bridge": "bridge component",
+    "ipm": "rotor"
+
+}
+
+COMPONENT_TERMS = {
+    "rotor", "stator", "stator core", "bridge component", 
+    "tooth", "yoke", "back iron", "slot", "lamination"
 }
 
 def load_entities():
@@ -93,14 +123,44 @@ def canonicalise(entity_text, value_numeric, unit):
         return f"{value_numeric} {unit}"
     # everything else: keep original text as-is (grades/terms canonicalised later)
     return entity_text
+
 def canonicalise_entity(entity_text, label):
-    #only canonicalising competitor names
-    if label != "COMPETING_MATERIAL":
+    #combines normalisation of both applications and competeing material names.
+    if label not in ["COMPETING_MATERIAL", "APPLICATION"]:
         return entity_text
+    
     if not isinstance(entity_text, str):
         return entity_text
+    
+    text_lower = entity_text.lower().strip()
+
+    if label == "COMPETING_MATERIAL":
+        return COMPETITOR_ALIASES.get(text_lower, entity_text)
+    elif label == "APPLICATION":
+        return APPLICATION_ALIASES.get(text_lower, entity_text)
+
+    return entity_text
+    
+    
+    
+    #only canonicalising competitor names
+    #if label != "COMPETING_MATERIAL":
+        #return entity_text
+    #if not isinstance(entity_text, str):
+        #return entity_text
         # checks for case insensitivites and any not mapped are not changed.
-    return COMPETITOR_ALIASES.get(entity_text.lower().strip(), entity_text)
+    #return COMPETITOR_ALIASES.get(entity_text.lower().strip(), entity_text)
+def assign_subtype(canonical_entity, label):
+    #distingueshes from acc products and components
+    if label != "APPLICATION":
+        return ""
+    if not isinstance(canonical_entity, str):
+        return "application"
+
+    if canonical_entity.lower().strip() in COMPONENT_TERMS:
+        return "component"
+
+    return "application"
 
 def resolve_property(context, label):
     # organising context for MPA values
@@ -171,6 +231,10 @@ def run_stage4():
         lambda row: canonicalise_entity(row['entity_text'], row['label']),
         axis=1
 )
+    filtered['subtype'] = filtered.apply(
+        lambda row: assign_subtype(row['canonical_entity'], row['label']),
+        axis=1
+)
     #Printed report
     print(f"Entities before filter: {before}")
     print(f"Entities after filter: {after}")
@@ -205,6 +269,16 @@ def run_stage4():
     comp = filtered[filtered['label'] == 'COMPETING_MATERIAL']
     print("\nCompetitor canonicalisation (surface -> canonical):")
     print(comp[['entity_text', 'canonical_entity']].drop_duplicates().to_string(index=False))
+    # canonicalisation of application entities check:
+    apps = filtered[filtered['label'] == 'APPLICATION']
+    print("\nApplication canonicalisation (surface -> canonical):")
+    print(apps[['entity_text', 'canonical_entity']].drop_duplicates().head(15).to_string(index=False))
+
+    # subtype split check
+    print("\nApplication Subtypes (Component vs Application):")
+    for subtype, group in apps.groupby('subtype')['canonical_entity']:
+        print(f"\n{subtype.upper()}:")
+        print(group.unique())
 #Saving file
     output_path = DATA_PROCESSED / "entities_normalised.csv"
     filtered.to_csv(output_path, index=False)

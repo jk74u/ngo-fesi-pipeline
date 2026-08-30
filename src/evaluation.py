@@ -105,12 +105,36 @@ def b4_stage3_precision():
     print(f"\nSaved {len(out_df)} total samples to {out_path.name}")
     print("Action: Open this file and score each extraction against your predefined criteria:")
     print("  (a) Label correct? (b) Span boundaries exact? (c) Genuine mention vs. table artifact?")
+def b5_Scope_mechanism():
+    print("\n--B5: scope sampling test--")
+    df = pd.read_csv(DATA_PROCESSED / "entities.csv")
+    scoped = df[df['scope_tag'].notna() & (df['scope_tag'] != '')]
+
+    unspecified = scoped[scoped['scope_tag'] == 'UNSPECIFIED']
+    resolved = scoped[scoped['scope_tag'].isin(['NGO','COMPETITOR', 'AMBIGUOUS'])]
+#sample from each group
+    unspec_sample = unspecified.sample(min(30, len(unspecified)), random_state=42)
+    resolved_sample = resolved.sample(min(30, len(resolved)), random_state=42)
+
+    unspec_sample = unspec_sample.assign(group='UNSPECIFIED')
+    resolved_sample = resolved_sample.assign(group='RESOLVED')
+    combined = pd.concat([unspec_sample, resolved_sample])
+   # building the table for save csv
+    cols = ['group', 'entity_text', 'label', 'scope_tag', 'context', 'start_char', 'end_char']
+    out = combined[[c for c in cols if c in combined.columns]].copy()
+    out['table_or_prose'] = ''   # blank column for you to fill in
+
+    out.to_csv(DATA_PROCESSED / "s3_scope_mechanism_sample.csv", index=False)
+    print(f"Saved {len(out)} entities ({len(unspec_sample)} unspecified, {len(resolved_sample)} resolved)")
+    print("Action: classify each context as 'table' or 'prose' in the table_or_prose column")
+
 
 if __name__ == "__main__":
     b1_stage7_precision()
     b2_stage7_sensitivity()
     b3_stage6_unitisation()
     b4_stage3_precision()
+    b5_Scope_mechanism()
 
 
 
