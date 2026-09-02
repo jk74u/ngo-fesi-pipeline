@@ -25,6 +25,7 @@ validation of cross checking the actual pdfs against a zoetero record to encure 
 Problems: some text names were not consistent across actual pdf and zotero metadata. plus some pdf were missing its metadata that had to be handled mannually (short unwanted fix).
 table data is flattend in order yes but falttened. will have to fix later stages of pipeline
 Ai use: intructional guidance on how to code in desgin and discussion on the overall design of teh system including the way forward in building each section.
+
 11/8/26
 Built s2_filter.py — coarse document-level filter tagging each doc is_relevant + domain_term_hits, reading corpus.csv, writing corpus_filtered.csv. Tags, doesn't delete (full corpus retained; dropped papers recoverable).
 Method: case-insensitive count of distinct DOMAIN_TERMS (27 terms, tiered by identity/property/structure/application) against RELEVANCE_THRESHOLD, both in config.py.
@@ -33,31 +34,54 @@ Validated against known corpus: cleanly separates ~14 steel-domain papers from M
 Known limitation (logged honestly): frequency-counting measures vocabulary-density, not topical focus — so vocabulary-dense market/demand papers (Bauer 21, Lucchini 19) pass despite being market-side not materials-side. No threshold cleanly removes them; decision is to separate them at the clustering stage rather than distort the filter.
 De Almeida (8, borderline transformer-regulation paper) — [note whichever you decided: kept as application-context / flagged borderline].
 Rejected alternative: embedding-similarity filtering — deferred to Pass 2 as more robust but less transparent.
+
 12/8/26: 
 spaCy pipeline established; pretrained NER (Tier 3) confirmed working on filtered corpus — catches producers (ORG) and geography (GPE); heavy noise on units/table-numbers/citations observed, confirming the need for Tier-1 regex and Tier-2 gazetteers to handle domain entities the general model mishandles.
 13/8/26:STAGE 3 PIECES 3(MEASUREMENT REGEX) PIECE 4(LOADING GAZETTEER) PIECE 5(CONTEXT SCOPING)
-Piece 3 key decisions & problems: so this is extration for numnerics such as core loss si content flux density etc. the key issue here is the constatnly testing to see if they could be gathered in one token or more was needed. Also results of whether accidental figures that looks like flux density was gathered which we had to tighten the formula struture for but also MPa values that did not seem realistic or relevant but filtering for this seems a job for another stage like S4 normalisation.
-piece 4: its now mapping the gazeteer files to SpaCy 8 files of text terms introducing those into the current numeric applied system
-piece 5: context scoping the attempt in trying to tag the context of the numeric values of whether it is relevant for an NGo or A GO.
-*  ok now how far do we scope for context well luckily ent.sent is a SpaCy function that can do the current sentence a target entity is in
-* we have NGO tags Competitor/OOS(Go) tag AMbigouous (conflited) unspecified (no clue) tags
-We base this off being able to make sure we are transparent as much as we can in finidngs. accuracy first if context is mixed then we dont weigh how much we just tag it mixed
-* sentence is stored with each entity and is retriveable for debugging and transparency.
+
+P key decisions & problems: so this is extration for numnerics such as core loss si content flux density etc. the key issue here is the constatnly testing to see if they could be gathered in one token or more was needed. Also results of whether accidental figures that looks like flux density was gathered which we had to tighten the formula struture for but also MPa values that did not seem realistic or relevant but filtering for this seems a job for another stage like S4 normalisation.
+
+stage 3 is now mapping the gazeteer files to SpaCy 8 files of text terms introducing those into the current numeric system
+
+context scoping:
+ the attempt in trying to tag the context of the numeric values of whether it is relevant for an NGo or A GO.
+
+use ent.sent a SpaCy function that can do the current sentence a target entity is in
+we have NGO tags Competitor/OOS(Go) tag AMbigouous (conflited) unspecified (no clue) tags. We base this off being able to make sure we are transparent as much as we can in finidngs. accuracy first if context is mixed then we dont weigh how much we just tag it mixed
+
+sentence is stored with each entity and is retriveable for debugging and transparency.
+
 RESULTS 268 UNSPECIFIED, 24 COMPETITOR, 22 NGO, 6 AMBIGOUOUS.
 now the unspecification could come down to 2 reasons but after tests came down to most numeric data living in tables and due to flattening table extraction is difficult and therefore grabbing context even more so.
+
 Ai use:AI note (for GAIT): Claude explained the sentence-scoping approach, the character-span/ent.sent mechanism, and reviewed/debugged the code; scoping logic and design decisions implemented and reasoned by me.
 
+14/8/26:Normalisations stage 4
+generic SpCy neams filtered out throug KEEP_NAMES.
 
+Mpa and Si values normalised W15/50 flux types left alone and Tesla measuremnts just corrected on spelling.
 
+MPa values context scoped
 
+15/8/26: stage 5 clustering
+whole texts are processed. topics are formced at 500 char chunk level for specificness 
+UMap seeded to set randomness fixed
+minimum topic size at ten returns 39 topics (shoulda been reduced as topic 0 dominates and is vauge)
 
+17/8/26 : temporal setup 
+topics over time  and visualisation plots built. 
 
+some plots such as line graphs ditched not appropriate 
+stacked bar charts used for application and competitor share
 
+18/8/26: Cost bridge
+Hemsens equation applied and visualiesd
+thickness parsed from grades and ploteed 
 
-
-25/8/26: BigQuery automatic patent input 
+25/8/26: BigQuery automatic patent input (wasted time)
 Google cloud project ID:ngo-fesi-patents
 27/8/26: canocalising entity spellings off supervisor feedback, plotted graphs off cost, thicness distribution , and results of stage 3 
+30/8/26: fixing stacked graphs canonlicalising applicationas and seperating them from components
 
 
 

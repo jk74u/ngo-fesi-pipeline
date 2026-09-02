@@ -142,7 +142,7 @@ def plot_thickness_distribution(bridge_df):
     fig, ax = plt.subplots(figsize=(9,6))
     ax.bar(counts.index.astype(str), counts.values, color='steelblue', width=0.6)
     ax.set_xlabel("Sheet thickness (mm)")
-    ax.set_ylabel("Number of grades")
+    ax.set_ylabel("Number of grade mentions")
     ax.set_title("Grades sheet thickness distribution")
 
     for i, v in enumerate(counts.values):

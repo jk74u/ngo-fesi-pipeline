@@ -96,7 +96,7 @@ def plot_heatmap(table, title, outpath):
             
     plt.title(title)
     plt.tight_layout()
-    plt.savefig(outpath, dpi=120)
+    plt.savefig(str(outpath), dpi=120)
     plt.close()
 
 def plot_trends(table, title, outpath):
@@ -113,7 +113,7 @@ def plot_trends(table, title, outpath):
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=7)
 
     plt.tight_layout()
-    plt.savefig(outpath, dpi=120)
+    plt.savefig(str(outpath), dpi=120)
     plt.close()
 
 def plot_stacked(table, title, outpath, docs_per_bucket=None):
@@ -202,7 +202,7 @@ def run_stage6():
             plot_heatmap(
                 topic_trends.loc[active_steel_topics].rename(index=topic_name_map),
                 "Steel-Relevant Topics Over Time (Distic Docs)",
-                DATA_PROCESSED / "topic_trends_steel.png"
+                DATA_PROCESSED / "topic_trends_steels.png"
             )
             print("E-steel relevant topics saved to : topic_heatmap_steel.png")
     else:

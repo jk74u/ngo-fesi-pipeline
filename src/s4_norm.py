@@ -71,6 +71,8 @@ COMPETITOR_ALIASES = {
 APPLICATION_ALIASES = {
     "hybrid electric vehicle": "hybrid electric vehicle",
     "hev": "hybrid electric vehicle",
+    "ev": "electric vehicle",
+    "electric vehicle": "electric vehicle",
     "stator": "stator",
     "stator core": "stator",
     "bridge": "bridge component",

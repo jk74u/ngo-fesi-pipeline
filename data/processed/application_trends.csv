@@ -2,7 +2,6 @@ canonical_entity,1990-1994,1995-1999,2000-2004,2005-2009,2010-2014,2015-2019,202
 BEV,0,0,0,0,0,0,2,0
 DER transformer,0,0,0,0,0,1,0,0
 EPS motor,0,0,0,1,0,0,0,0
-EV,0,0,0,0,2,2,2,1
 EV traction motor,0,0,0,0,0,0,2,0
 HEV traction motor,0,0,0,1,1,0,0,0
 IPM machine,0,0,0,0,1,0,0,0
@@ -17,7 +16,7 @@ distribution transformer,1,0,0,0,0,1,1,0
 drive motor,0,0,0,0,0,0,1,0
 electric power steering,0,0,0,0,0,0,1,0
 electric traction motor,0,0,0,0,0,0,1,0
-electric vehicle,0,0,0,0,0,0,3,0
+electric vehicle,0,0,0,0,2,2,3,1
 generator,0,0,0,0,0,0,2,1
 high-speed motor,0,0,0,1,0,0,0,0
 hybrid electric vehicle,0,0,0,1,2,1,2,0
